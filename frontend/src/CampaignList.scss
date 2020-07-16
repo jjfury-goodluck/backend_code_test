@@ -1,0 +1,103 @@
+.campaign_box{
+    width: 70vw;
+    border-style: solid;
+    margin: 30px;
+    border-radius: 8px;
+    padding-bottom: 40px;
+
+    .time_container{
+        font-size: 20px;
+        font-weight: bold;
+        margin: 10px;
+
+        .time_decorate{
+            background-color:rgb(29, 196, 238);
+            border-radius: 5px;
+            margin: 10px;
+            padding: 3px;
+            
+        }
+    }
+    
+    .campaign_over{
+        color: rgb(160, 160, 160);
+        text-shadow: 1px 1px #696161;
+        font-size: 30px;
+        font-weight: bold;
+        margin: 15px;
+    }
+
+    .campaign_ongoing{
+        color: rgb(20, 196, 14);
+        text-shadow: 1px 1px #696161;
+        font-size: 30px;
+        font-weight: bold;
+        margin: 15px;
+    }
+
+    .campaign_incoming{
+        color: rgb(236, 240, 18);
+        text-shadow: 1px 1px #696161;
+        font-size: 30px;
+        font-weight: bold;
+        margin: 15px;
+    }
+
+    .campaign_name{
+        font-size: 30px;
+        font-weight: bold;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .candidate_ongoing{
+        margin-left: 10px;
+        padding: 4px;
+        border-radius: 4px;
+        background-color: rgb(183, 238, 251);
+        font-weight: bold;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .candidate_ongoing:hover{
+        background-color: rgb(66, 211, 243);
+    }
+
+    .not_yet_started{
+        margin: 20px;
+        padding: 4px;
+        border-radius: 4px;
+        background-color: rgb(86, 117, 124);
+        font-weight: bold;
+        font-size: 20px;
+        color: rgb(255, 255, 255);
+    }
+
+    .candidate_result{
+        margin-left: 10px;
+        padding: 4px;
+        border-radius: 4px;
+        background-color: rgb(160, 160, 160);
+        color: rgb(255, 255, 255);
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+    .vote_result_container>label{
+        font-weight: bold;
+        font-size: 20px;
+        text-decoration: underline;
+        margin: 10px;
+    }
+} 
+
+.hkid_container{
+    margin: 15px;
+    
+    div{
+        font-weight: bold;
+    }
+}
+
+    

@@ -35,7 +35,7 @@ app.use(cors({
 
 app.use('/campaign', votingRouter.route());
 app.use('/user', userRouter.route());
-app.use('/admin', isLoggedIn, adminRouter.route());
+app.use('/admin', isLoggedIn(userService), adminRouter.route());
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {

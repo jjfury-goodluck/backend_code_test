@@ -8,7 +8,6 @@ export class VotingRouter {
     route() {
         const router = express.Router();
         router.get('/', this.getCampaign);
-        router.post('/', this.getVote);
         router.post('/vote', this.voting);
         return router;
     }
@@ -16,21 +15,9 @@ export class VotingRouter {
     getCampaign = async (req: Request, res: Response) => {
         try {
 
-            const campaign = await this.votingService.getCampaign()
+            const campaigns = await this.votingService.getCampaign()
 
-            return res.status(200).json(campaign)
-        } catch (e) {
-            console.error(e);
-            return res.status(500).json({ msg: "Internal server error" });
-        }
-    }
-
-    getVote = async (req: Request, res: Response) => {
-        try {
-
-            const campaign = await this.votingService.getVote(req.body.campaignId)
-
-            return res.status(200).json(campaign)
+            return res.status(200).json({ campaigns: campaigns })
         } catch (e) {
             console.error(e);
             return res.status(500).json({ msg: "Internal server error" });

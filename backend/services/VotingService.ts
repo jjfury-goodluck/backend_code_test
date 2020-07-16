@@ -1,9 +1,13 @@
 import Knex from 'knex';
-import { client, CampaignClient } from '../model';
+import moment from 'moment';
+import 'moment-timezone';
+import { client, CampaignClient, CampaignsWithCandidates, Candidate } from '../model';
 
 
 export class VotingService {
-    constructor(private knex: Knex) { }
+
+    constructor(private knex: Knex) {
+    }
 
     getCampaign = async () => {
 
@@ -12,18 +16,13 @@ export class VotingService {
             'name',
             'from_time',
             'to_time'
-        )
+        ).orderBy('to_time', 'desc')
 
-        return campaigns;
-    }
-
-    getVote = async (campaignId: number) => {
-
-        const candidates = await this.knex('candidates').select(
+        const candidates: Candidate[] = await this.knex('candidates').select(
             'id',
             'name',
             'campaign_id'
-        ).where('campaign_id', campaignId)
+        )
 
         const voteOfCandidates = await this.knex.select(
             'candidates.name',
@@ -33,40 +32,105 @@ export class VotingService {
             .leftJoin('candidates', 'candidates.id', 'campaigns_clients.candidate_id')
             .groupBy('candidates.name', 'campaigns.id')
             .count('candidates.name')
-            .where('campaigns.id', campaignId)
 
-        return {
-            candidates: candidates,
-            voteOfCandidates: voteOfCandidates
+        let campaignsWithCandidates: CampaignsWithCandidates[] = [];
+
+        for (let campaign of campaigns) {
+            for (let candidate of candidates) {
+                if (campaign.id == candidate.campaign_id) {
+                    if (campaign["candidates"]) {
+                        campaign["candidates"].push({ id: candidate.id, name: candidate.name, vote: 0 })
+                    } else {
+                        campaign["candidates"] = [];
+                        campaign["candidates"].push({ id: candidate.id, name: candidate.name, vote: 0 })
+                    }
+                }
+            }
+            campaignsWithCandidates.push(campaign)
         }
+
+        let result: CampaignsWithCandidates[] = [];
+
+        for (let campaign of campaignsWithCandidates) {
+            for (let candidate of voteOfCandidates) {
+                if (campaign.id == candidate.id) {
+                    for (let candInCamp of campaign.candidates) {
+                        if (candInCamp.name == candidate.name) {
+                            candInCamp['vote'] = Number(candidate.count)
+                        }
+                    }
+                }
+            }
+            result.push(campaign)
+        }
+
+        return result;
     }
+
 
     voting = async (campaignId: number, hkid: string, candidateId: number) => {
 
-        //差個時間控制
+        if (hkid == '') {
+            return "Please enter HKID !"
+        }
 
-        let clientId: client[] = (await this.knex('clients').where('hkid', hkid))
+        let campaign = (await this.knex('campaigns')
+            .where('id', campaignId)
+            .select(
+                'from_time',
+                'to_time'
+            ))[0]
+
+        const curTime = (moment.tz(moment(), 'Hongkong'))
+
+        if (moment.tz(campaign.to_time, 'Hongkong') <= curTime || moment.tz(campaign.from_time, 'Hongkong') > curTime) {
+            return "Voting period error! please contact the technician."
+        }
+
+        let clientId: client[] = (await this.knex('clients')
+            .where('hkid', hkid)
+            .select(
+                'id',
+                'hkid'
+            ))
+
+        let alreadyVoted: CampaignClient[]
 
         if (!clientId[0]) {
-            clientId = await this.knex('clients').returning('id').insert({ hkid: hkid })
+            const newClientId: number = (await this.knex('clients').returning('id').insert({ hkid: hkid }))[0]
+
+            await this.knex('campaigns_clients').where({
+                campaign_id: campaignId,
+                client_id: newClientId
+            })
+
+            await this.knex('campaigns_clients').insert({
+                'campaign_id': campaignId,
+                'client_id': newClientId,
+                'candidate_id': candidateId
+            });
+
+            return "Thank you for your participation! Result will be published when campaign finishes."
+
+        } else {
+            alreadyVoted = await this.knex('campaigns_clients').where({
+                campaign_id: campaignId,
+                client_id: clientId[0].id
+            })
+
+            if (alreadyVoted[0]) {
+                return "You've already voted!"
+            }
+
+            await this.knex('campaigns_clients').insert({
+                'campaign_id': campaignId,
+                'client_id': clientId[0].id,
+                'candidate_id': candidateId
+            });
+
+            return "Thank you for your participation! Result will be published when campaign finishes."
         }
 
-        const alreadyVoted: CampaignClient[] = await this.knex('campaigns_clients').where({
-            campaign_id: campaignId,
-            client_id: clientId
-        })
-
-        if (alreadyVoted[0]) {
-            return "You've already voted!"
-        }
-
-        await this.knex('campaigns_clients').insert({
-            'campaign_id': campaignId,
-            'client_id': clientId,
-            'candidate_id': candidateId
-        });
-
-        return "You've voted!"
     }
 }
 
@@ -75,4 +139,4 @@ export class VotingService {
 // const knex = Knex(knexConfig[process.env.NODE_ENV || 'development']);
 
 // const x = new VotingService(knex);
-// x.getVote(4)
+// x.getCampaign()

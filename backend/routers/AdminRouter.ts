@@ -27,9 +27,9 @@ export class AdminRouter {
                 return res.status(401).json({ msg: "Unauthorized" });
             }
 
-            const { name, to, from } = req.body
+            const { name, candidates, to, from } = req.body
 
-            const result = await this.adminService.addCampaign(name, from, to)
+            const result = await this.adminService.addCampaign(name, candidates, from, to)
 
             return res.status(200).json({ msg: result });
 

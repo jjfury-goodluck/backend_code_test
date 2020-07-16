@@ -10,6 +10,7 @@ const permit = new Bearer({
 })
 
 export function isLoggedIn(userService: UserService) {
+
     return async (
         req: express.Request,
         res: express.Response,
@@ -22,7 +23,6 @@ export function isLoggedIn(userService: UserService) {
             }
             const payload = jwtSimple.decode(token, jwt.jwtSecret);
             const user: User = await userService.getUser(payload.id, payload.username);
-
             if (user) {
                 req.user = user;
                 return next();

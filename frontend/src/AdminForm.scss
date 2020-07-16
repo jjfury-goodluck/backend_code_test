@@ -1,0 +1,25 @@
+.admin_form{
+    background-color: rgb(183, 238, 251);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-style: solid;
+    border-radius: 3px;
+    padding: 10px;
+    position: fixed;
+    right: 1rem;
+    top: 3rem;
+
+    input{
+        margin: 10px;
+    }
+
+    input[type=text]{
+        width: 80%;
+    }
+
+    input[type=submit]{
+        border-radius: 5px;
+    }
+}

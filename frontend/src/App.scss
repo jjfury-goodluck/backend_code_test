@@ -1,0 +1,17 @@
+.App{
+    display: flex;
+    position: relative;
+    justify-content: center;
+
+    .logout_button{
+        position: fixed;
+        right: 1rem;
+        top: 24rem;
+    }
+
+    .toggle_button{
+        position: fixed;
+        right: 1rem;
+        top: 1rem;
+    }
+}
