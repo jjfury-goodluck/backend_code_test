@@ -20,6 +20,9 @@ function CampaignList() {
     function submit(candidate: string, campaignId: number, hkid: string, candidateId: number) {
         if (hkid === '') {
             alert("Please enter HKID !")
+        } else if (hkid.length !== 10 &&
+            hkid.match(/^([A-Z]{1,2})([0-9]{6})\(([A0-9])\)$/) === null) {
+            alert("Incorrect HKID !")
         } else {
             confirmAlert({
                 title: 'Confirm to vote',
@@ -28,7 +31,8 @@ function CampaignList() {
                     {
                         label: 'Yes',
                         onClick: async () => {
-                            await dispatch(voting(campaignId, hkid, candidateId))
+                            await dispatch(voting(campaignId, hkid, candidateId));
+                            formState.clear();
                         }
                     },
                     {
@@ -78,14 +82,13 @@ function CampaignList() {
                             {(moment.tz(campaign.to_time, 'Hongkong') >= curTime && moment.tz(campaign.from_time, 'Hongkong') <= curTime) ?
                                 campaign.candidates.map((candidate, j) => {
                                     return (
-                                        <span key={j + "vote_result_container"} className="vote_result_container">
+                                        <div key={j + "vote_result_container"} className="vote_result_container">
                                             <span key={j + "candidate_ongoing"} className="candidate_ongoing"
                                                 onClick={async (e) => {
                                                     await submit(candidate.name, campaign.id, formState.values.hkid, candidate.id);
-                                                    formState.clear();
                                                 }}>{candidate.name}</span>
                                             <label key={j + "vote_result"} >{candidate.vote}</label>
-                                        </span>
+                                        </div>
                                     )
                                 }) :
                                 (moment.tz(campaign.from_time, 'Hongkong') > curTime) ?
@@ -96,10 +99,10 @@ function CampaignList() {
                                     }) :
                                     campaign.candidates.map((candidate, j) => {
                                         return (
-                                            <span key={j + "vote_result_container"} className="vote_result_container">
+                                            <div key={j + "vote_result_container"} className="vote_result_container">
                                                 <span key={j + "candidate_result"} className="candidate_result">{candidate.name}</span>
                                                 <label key={j + "vote_result"} >{candidate.vote}</label>
-                                            </span>
+                                            </div>
                                         )
                                     })
                             }

@@ -1,7 +1,7 @@
 import Knex from 'knex';
 import moment from 'moment';
 import 'moment-timezone';
-import { client, CampaignClient, CampaignsWithCandidates, Candidate } from '../model';
+import { client, CampaignClient, CampaignsWithCandidates } from '../model';
 
 
 export class VotingService {
@@ -18,53 +18,36 @@ export class VotingService {
             'to_time'
         ).orderBy('to_time', 'desc')
 
-        const candidates: Candidate[] = await this.knex('candidates').select(
-            'id',
-            'name',
-            'campaign_id'
-        )
-
         const voteOfCandidates = await this.knex.select(
+            'candidates.id',
             'candidates.name',
-            'campaigns.id'
+            'candidates.campaign_id as campaignId',
+            'campaigns.id as campaignCount'
         ).from('campaigns_clients')
             .leftJoin('campaigns', 'campaigns.id', 'campaigns_clients.campaign_id')
-            .leftJoin('candidates', 'candidates.id', 'campaigns_clients.candidate_id')
-            .groupBy('candidates.name', 'campaigns.id')
-            .count('candidates.name')
+            .fullOuterJoin('candidates', 'candidates.id', 'campaigns_clients.candidate_id')
+            .groupBy('candidates.id', 'candidates.name', 'campaignId', 'campaignCount')
+            .count('campaigns.id')
+            .orderBy([{ column: 'campaignId', order: 'desc' }, { column: 'count', order: 'desc' }]);
+
 
         let campaignsWithCandidates: CampaignsWithCandidates[] = [];
 
         for (let campaign of campaigns) {
-            for (let candidate of candidates) {
-                if (campaign.id == candidate.campaign_id) {
+            for (let candidate of voteOfCandidates) {
+                if (campaign.id == candidate.campaignId) {
                     if (campaign["candidates"]) {
-                        campaign["candidates"].push({ id: candidate.id, name: candidate.name, vote: 0 })
+                        campaign["candidates"].push({ id: candidate.id, name: candidate.name, vote: candidate.count })
                     } else {
                         campaign["candidates"] = [];
-                        campaign["candidates"].push({ id: candidate.id, name: candidate.name, vote: 0 })
+                        campaign["candidates"].push({ id: candidate.id, name: candidate.name, vote: candidate.count })
                     }
                 }
             }
             campaignsWithCandidates.push(campaign)
         }
 
-        let result: CampaignsWithCandidates[] = [];
-
-        for (let campaign of campaignsWithCandidates) {
-            for (let candidate of voteOfCandidates) {
-                if (campaign.id == candidate.id) {
-                    for (let candInCamp of campaign.candidates) {
-                        if (candInCamp.name == candidate.name) {
-                            candInCamp['vote'] = Number(candidate.count)
-                        }
-                    }
-                }
-            }
-            result.push(campaign)
-        }
-
-        return result;
+        return campaignsWithCandidates;
     }
 
 
@@ -72,6 +55,9 @@ export class VotingService {
 
         if (hkid == '') {
             return "Please enter HKID !"
+        } else if (hkid.length !== 10 &&
+            hkid.match(/^([A-Z]{1,2})([0-9]{6})\(([A0-9])\)$/) === null) {
+            return "Incorrect HKID !"
         }
 
         let campaign = (await this.knex('campaigns')

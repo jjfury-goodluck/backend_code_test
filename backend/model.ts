@@ -34,7 +34,7 @@ export interface CampaignsWithCandidates {
 export interface Candidate {
     id: number;
     name: string;
-    campaign_id: number;
+    vote: number;
 }
 
 export interface VoteOfCandidates {
