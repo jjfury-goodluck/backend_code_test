@@ -1,10 +1,13 @@
+import moment from 'moment';
+import 'moment-timezone';
 import { ThunkDispatch, RootState } from "../../store";
 import { setMessage } from "./action";
 
 
 export function addCampaign(name: string, candidates: string, from: string, to: string) {
     return async (dispatch: ThunkDispatch, getState: () => RootState) => {
-        if (from >= to) {
+        const curDateTime = moment.tz(moment(), 'Hongkong').format()
+        if (from >= to || from < curDateTime) {
             dispatch(setMessage("Wrong time interval"))
             return
         }

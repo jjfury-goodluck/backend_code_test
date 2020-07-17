@@ -1,11 +1,14 @@
 import Knex from 'knex';
+import moment from 'moment';
+import 'moment-timezone';
 
 
 export class AdminService {
     constructor(private knex: Knex) { }
 
     addCampaign = async (name: string, candidates: string, from: string, to: string) => {
-        if (from >= to) {
+        const curDateTime = moment.tz(moment(), 'Hongkong').format()
+        if (from >= to || from < curDateTime) {
             return "Wrong time interval"
         }
 
