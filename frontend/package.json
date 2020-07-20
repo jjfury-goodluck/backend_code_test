@@ -14,10 +14,10 @@
     "@types/react-router-dom": "^5.1.5",
     "@types/redux-logger": "^3.0.7",
     "@types/redux-thunk": "^2.1.0",
+    "@types/socket.io-client": "^1.4.33",
     "connected-react-router": "^6.8.0",
     "i": "^0.3.6",
     "moment": "^2.26.0",
-    "moment-timezone": "^0.5.31",
     "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-confirm-alert": "^2.6.1",
@@ -30,6 +30,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "sass": "^1.26.10",
+    "socket.io-client": "^2.3.0",
     "typescript": "~3.7.2"
   },
   "scripts": {

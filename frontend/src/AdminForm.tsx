@@ -10,8 +10,8 @@ import { addCampaign } from './redux/admin/thunk';
 
 function AdminForm() {
     const dispatch = useDispatch();
-    const curDateTime = moment().format();
-    const oneDayAfter = moment().add(1, 'days').format();
+    const curDateTime = moment().add(5, 'minutes').format();
+    const oneDayAfter = moment().add(1, 'days').add(5, 'minutes').format();
     const indexOfFormat = curDateTime.indexOf("+");
     const formatedFrom = curDateTime.slice(0, indexOfFormat);
     const formatedTo = oneDayAfter.slice(0, indexOfFormat);

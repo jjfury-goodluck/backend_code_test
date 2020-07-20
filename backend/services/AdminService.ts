@@ -1,48 +1,52 @@
 import Knex from 'knex';
 import moment from 'moment';
-import 'moment-timezone';
-
 
 export class AdminService {
-    constructor(private knex: Knex) { }
+    constructor(private knex: Knex) {}
 
-    addCampaign = async (name: string, candidates: string, from: string, to: string) => {
-        const curDateTime = moment.tz(moment(), 'Hongkong').format()
-        if (from >= to || from < curDateTime) {
-            return "Wrong time interval"
+    addCampaign = async (
+        name: string,
+        candidates: string,
+        from: string,
+        to: string
+    ) => {
+        const curDateTime = moment();
+        if (
+            moment(from).isSameOrAfter(to) ||
+            moment(from).isBefore(curDateTime)
+        ) {
+            throw new Error('Wrong time interval');
         }
 
-        const candidateArray: string[] = candidates.split(',')
+        const candidateArray: string[] = candidates.split(',');
         const trx = await this.knex.transaction();
 
         try {
-            const campaignId = await trx('campaigns').insert({
-                name: name,
-                from_time: from,
-                to_time: to
-            }).returning('id');
+            const [campaignId] = await trx('campaigns')
+                .insert({
+                    name: name,
+                    from_time: from,
+                    to_time: to,
+                })
+                .returning('id');
 
             for (let candidate of candidateArray) {
                 await trx('candidates').insert({
                     name: candidate,
-                    campaign_id: campaignId[0]
-                })
+                    campaign_id: campaignId,
+                });
             }
 
-            console.log("[info] Transaction commit");
+            console.log('[info] Transaction commit');
             await trx.commit();
-
-            return "Campaign created";
-
+            return 'Campaign created';
         } catch (err) {
             console.error(err);
-
             console.log('[info]Transaction rollback');
             await trx.rollback();
-            return "Failed to create"
+            throw new Error('Failed to create');
         } finally {
             await trx.destroy();
         }
-
-    }
+    };
 }

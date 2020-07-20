@@ -2,7 +2,8 @@ import { CampaignActions } from "./action"
 
 
 export interface CampaignState {
-    campaign: Campaign[]
+    campaign: Campaign[];
+    client: Client | null;
     message: string | null;
 }
 
@@ -18,10 +19,17 @@ interface Candidates {
     id: number;
     name: string;
     vote: number;
+    youVoted: boolean;
+}
+
+export interface Client {
+    id: number;
+    hkid: string;
 }
 
 const initialState = {
     campaign: [],
+    client: null,
     message: null
 }
 
@@ -31,6 +39,12 @@ export const campaignReducer = (state: CampaignState = initialState, action: Cam
             return {
                 ...state,
                 campaign: action.campaign
+            }
+
+        case "@@CAMPAIGN/SET_CLIENT":
+            return {
+                ...state,
+                client: action.client
             }
 
         case "@@CAMPAIGN/SET_MESSAGE":

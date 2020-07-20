@@ -1,7 +1,7 @@
 declare global {
     namespace Express {
         interface Request {
-            user?: User
+            user?: User;
         }
     }
 }
@@ -12,9 +12,16 @@ export interface User {
     password: string;
 }
 
-export interface client {
+export interface Client {
     id: number;
     hkid: string;
+}
+
+export interface Campaign {
+    id: number;
+    name: string;
+    from_time: string;
+    to_time: string;
 }
 
 export interface CampaignClient {
@@ -23,22 +30,26 @@ export interface CampaignClient {
     client_id: number;
 }
 
-export interface CampaignsWithCandidates {
-    id: number;
-    name: string;
-    from_time: string;
-    to_time: string;
-    candidates: Candidate[];
+export interface CandidatesMapping {
+    [key: number]: Candidate[];
 }
 
 export interface Candidate {
     id: number;
     name: string;
     vote: number;
+    youVoted: boolean;
+}
+
+export interface CandidateWithVote {
+    id: number;
+    name: string;
+    campaignId: number;
+    count: number;
 }
 
 export interface VoteOfCandidates {
     name: string;
     id: number;
     count: string;
-} 
+}
